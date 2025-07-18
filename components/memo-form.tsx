@@ -167,17 +167,22 @@ export default function MemoForm() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="mobile">Mobile Number *</Label>
-              <Input
-              id="mobile"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                searchCustomer(mobile)
-                }
-              }}
-              placeholder="Enter mobile number to search"
-              />
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="mobile"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      searchCustomer(mobile)
+                    }
+                  }}
+                  placeholder="Enter mobile number to search"
+                />
+                <Button onClick={() => searchCustomer(mobile)} disabled={searchingCustomer}>
+                  {searchingCustomer ? "Searching..." : "Search"}
+                </Button>
+              </div>
             </div>
             <div>
               <Label htmlFor="name">Customer Name *</Label>
