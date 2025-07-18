@@ -163,7 +163,7 @@ export default function SalesSummary() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold">${totalAmount.toFixed(2)}</div>
+                    <div className="text-2xl font-bold">BDT. {totalAmount.toFixed(2)}</div>
                     <div className="text-sm text-muted-foreground">Total Sales</div>
                   </CardContent>
                 </Card>
@@ -213,7 +213,7 @@ export default function SalesSummary() {
                           <div className="font-medium">{day.date}</div>
                           <div className="text-sm text-muted-foreground">{day.totalMemos} memos</div>
                         </div>
-                        <div className="font-bold">${day.totalAmount.toFixed(2)}</div>
+                        <div className="font-bold">BDT. {day.totalAmount.toFixed(2)}</div>
                       </div>
                     ))}
                   </div>
@@ -240,7 +240,7 @@ export default function SalesSummary() {
                                 <div className="text-sm text-muted-foreground">{memo.customerMobile}</div>
                               </div>
                               <div className="text-right">
-                                <div className="font-medium">${memo.totalAmount.toFixed(2)}</div>
+                                <div className="font-medium">BDT. {memo.totalAmount.toFixed(2)}</div>
                                 <div className="text-sm text-muted-foreground">{memo.date.toLocaleDateString()}</div>
                               </div>
                             </div>

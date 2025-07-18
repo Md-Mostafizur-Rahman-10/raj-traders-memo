@@ -249,7 +249,7 @@ export default function CustomerHistory() {
                       <div className="flex-1">
                         <div className="font-medium">{memo.date.toLocaleDateString()}</div>
                         <div className="text-sm text-muted-foreground">
-                          {memo.items.length} items • ${memo.totalAmount.toFixed(2)}
+                          {memo.items.length} items • BDT. {memo.totalAmount.toFixed(2)}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {memo.items.map((item) => `${item.itemName} (${item.quantity} ${item.unit})`).join(", ")}

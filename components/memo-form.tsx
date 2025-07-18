@@ -318,7 +318,7 @@ export default function MemoForm() {
                 <div key={memo.id} className="flex justify-between items-center p-2 border rounded">
                   <div>
                     <span className="font-medium">{memo.date.toLocaleDateString()}</span>
-                    <span className="ml-4">${memo.totalAmount.toFixed(2)}</span>
+                    <span className="ml-4">BDT. {memo.totalAmount.toFixed(2)}</span>
                   </div>
                   <Button
                     variant="outline"
