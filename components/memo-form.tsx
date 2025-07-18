@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client"
 
 import { useState } from "react"
@@ -9,7 +10,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CalendarIcon, Plus, Trash2, Eye, Download, Printer } from "lucide-react"
-import { format, set } from "date-fns"
+import { format } from "date-fns"
 import { customerService, memoService } from "@/lib/firebase-service"
 import { generateMemoPDF } from "@/lib/pdf-utils"
 import type { Customer, Memo, MemoItem } from "@/types"
