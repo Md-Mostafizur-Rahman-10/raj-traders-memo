@@ -210,7 +210,7 @@ export default function CustomerHistory() {
               <Card>
                 <CardContent className="p-4">
                   <div className="text-2xl font-bold">
-                    ${memos.reduce((sum, memo) => sum + memo.totalAmount, 0).toFixed(2)}
+                    BDT. {memos.reduce((sum, memo) => sum + memo.totalAmount, 0).toFixed(2)}
                   </div>
                   <div className="text-sm text-muted-foreground">Total Amount</div>
                 </CardContent>
