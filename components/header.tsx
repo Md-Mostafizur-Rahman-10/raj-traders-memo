@@ -29,7 +29,7 @@ export default function Header() {
   return (
     <header className="border-b bg-white">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Shop Memo System</h1>
+        <h1 className="text-2xl font-bold">RAJ TRADERS</h1>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

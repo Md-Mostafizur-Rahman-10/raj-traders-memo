@@ -26,9 +26,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     )
   }
 
-  if (!user || user.email !== "aabansaad@gmail.com") {
-    return <LoginPage />
-  }
+  if (!user || (user.email !== "aabansaad@gmail.com" &&
+              user.email !== "badhon16@gmail.com" &&
+              user.email !== "mostafizurrahmanifat10@gmail.com")) {
+  return <LoginPage />;
+}
 
   return <>{children}</>
 }

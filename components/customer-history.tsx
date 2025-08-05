@@ -13,6 +13,7 @@ import { customerService, memoService } from "@/lib/firebase-service"
 import { generateMemoPDF, generateSalesSummaryPDF } from "@/lib/pdf-utils"
 import type { Customer, Memo } from "@/types"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export default function CustomerHistory() {
   const [mobile, setMobile] = useState("")
@@ -24,7 +25,7 @@ export default function CustomerHistory() {
 
   const searchCustomerHistory = async () => {
     if (!mobile) {
-      alert("Please enter mobile number")
+      toast("Please enter mobile number")
       return
     }
 
@@ -32,9 +33,10 @@ export default function CustomerHistory() {
     try {
       const foundCustomer = await customerService.getByMobile(mobile)
       if (!foundCustomer) {
-        alert("Customer not found")
+        toast("Customer not found")
         setCustomer(null)
         setMemos([])
+        setLoading(false)
         return
       }
 
@@ -43,7 +45,7 @@ export default function CustomerHistory() {
       setMemos(customerMemos)
     } catch (error) {
       console.error("Error searching customer history:", error)
-      alert("Error searching customer history")
+      toast("Error searching customer history")
     }
     setLoading(false)
   }
