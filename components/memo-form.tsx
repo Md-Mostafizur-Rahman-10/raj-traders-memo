@@ -1,7 +1,7 @@
 /* eslint-disable */
 "use client"
 
-import { useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -28,6 +28,35 @@ export default function MemoForm() {
   const [loading, setLoading] = useState(false)
   const [currentMemo, setCurrentMemo] = useState<Memo | null>(null)
   const [searchingCustomer, setSearchingCustomer] = useState(false)
+
+  const [realtimeSearchResult, setRealtimeSearchResult] = useState([] as Customer[])
+  const [realtimeItemSearchResult, setRealtimeItemSearchResult] = useState([] as MemoItem[])
+
+  const realtimeItemSearch = async (itemName: string) => {
+    if (!itemName) {
+      return
+    }
+    const foundItems = await memoService.getItemsByName(itemName)
+    console.log("Realtime search found items:", foundItems)
+    setRealtimeItemSearchResult(foundItems)
+  }
+
+  const realtimeCustomerSearch = async () => {
+    if (!mobile) {
+      return
+    }
+    const foundCustomer = await customerService.getManyByMobile(mobile)
+    console.log("Realtime search found customer:", foundCustomer)
+    setRealtimeSearchResult(foundCustomer)
+  }
+
+  useEffect(() => {
+    realtimeItemSearch(items[items.length - 1]?.itemName || "")
+  }, [items])
+
+  useEffect(() => {
+    realtimeCustomerSearch()
+  }, [mobile])
 
   const searchCustomer = async (mobileNumber: string) => {
     if (mobileNumber.length >= 10) {
@@ -86,6 +115,9 @@ export default function MemoForm() {
       toast("Please fill all required fields")
       return
     }
+
+    // Save new items if they do not exist
+    await memoService.saveItems(items)
 
     setLoading(true)
     try {
@@ -183,6 +215,22 @@ export default function MemoForm() {
                   {searchingCustomer ? "Searching..." : "Search"}
                 </Button>
               </div>
+              {
+                realtimeSearchResult.length > 0 && (
+                  <div className="col-span-4 border-2 border-black bg-gray-300 w-fit absolute mt-0 rounded-xl" hidden={!mobile || mobile.length === 11}>
+                    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
+                      {realtimeSearchResult.map((customer) => (
+                        <div key={customer.id} className="cursor-pointer hover:bg-gray-200" onClick={() => { setCustomer(customer); setName(customer.name); setAddress(customer.address); setMobile(customer.mobile); setCustomerHistory([]) }}>
+                          <div className="p-1">
+                            <div className="font-medium">{customer.name}</div>
+                            <div className="text-sm text-muted-foreground">{customer.mobile}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              }
             </div>
             <div>
               <Label htmlFor="name">Customer Name *</Label>
@@ -239,12 +287,45 @@ export default function MemoForm() {
             </div>
 
             {items.map((item, index) => (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-6 gap-2 mb-2 p-4 border rounded">
-                <Input
-                  placeholder="Item name"
-                  value={item.itemName}
-                  onChange={(e) => updateItem(index, "itemName", e.target.value)}
-                />
+              <div key={index} className="grid grid-cols-1 md:grid-cols-6 gap-2 mb-2 p-4 border rounded relative">
+                <div className="relative">
+                  <Input
+                    placeholder="Item name"
+                    value={item.itemName}
+                    onChange={(e) => updateItem(index, "itemName", e.target.value)}
+                  />
+                  {realtimeItemSearchResult.length > 0 && index === items.length - 1 && item.itemName && (
+                    <div className="z-10 border-2 border-black bg-gray-300 w-fit absolute mt-1 rounded-xl" hidden={item.itemName === realtimeItemSearchResult[0]?.itemName}>
+                      <div className="grid grid-cols-1 gap-1">
+                        {realtimeItemSearchResult.map((searchItem: MemoItem) => (
+                          <div
+                            key={searchItem.itemName}
+                            className="cursor-pointer hover:bg-gray-200"
+                            onClick={() => {
+                              updateItem(index, "itemName", searchItem.itemName);
+                              setItems((prevItems) => {
+                                const updatedItems = [...prevItems];
+                                updatedItems[index] = {
+                                  ...updatedItems[index],
+                                  itemName: searchItem.itemName,
+                                  unit: searchItem.unit,
+                                  rate: searchItem.rate,
+                                  amount: (updatedItems[index].quantity || 0) * (searchItem.rate || 0),
+                                };
+                                return updatedItems;
+                              });
+                            }}
+                          >
+                            <div className="p-1">
+                              <div className="font-medium">{searchItem.itemName}</div>
+                              <div className="text-sm text-muted-foreground">{searchItem.rate} taka/{searchItem.unit}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <Input
                   type="number"
                   placeholder="Quantity"
@@ -272,6 +353,7 @@ export default function MemoForm() {
                 </Button>
               </div>
             ))}
+
             <div className="w-full">
               <Button className="w-full" onClick={addItem} size="sm">
                 <Plus className="h-4 w-4 mr-2" />

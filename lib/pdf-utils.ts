@@ -9,14 +9,20 @@ export const generateMemoPDF = (memo: Memo): jsPDF => {
   doc.setFontSize(20)
   doc.setFont("helvetica", "bold")
   doc.text("RAJ TRADERS", 105, 20, { align: "center" })
+  doc.setFontSize(13)
+  doc.text("Importer & Wholesaler", 105, 26, { align: "center" })
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(10)
+  doc.text("Shop Address: Shop No. 5/8/9, 3 Ahsan Ullah Road, Islampur Dhaka-1100", 105, 31, { align: "center" })
+
   doc.setFont("helvetica", "normal")
 
   // Customer Details
   doc.setFontSize(12)
-  doc.text(`Date: ${memo.date.toLocaleDateString()} ${memo.date.toLocaleTimeString()}`, 20, 30)
-  doc.text(`Customer: ${memo.customerName}`, 20, 35)
-  doc.text(`Mobile: ${memo.customerMobile}`, 20, 40)
-  doc.text(`Address: ${memo.customerAddress}`, 20, 45)
+  doc.text(`Date: ${memo.date.toLocaleDateString()} ${memo.date.toLocaleTimeString()}`, 20, 40)
+  doc.text(`Customer: ${memo.customerName}`, 20, 45)
+  doc.text(`Mobile: ${memo.customerMobile}`, 20, 50)
+  doc.text(`Address: ${memo.customerAddress}`, 20, 55)
 
   // Items Table
   const tableData = memo.items.map((item) => [

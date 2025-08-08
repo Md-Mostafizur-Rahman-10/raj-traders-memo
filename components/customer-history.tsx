@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,6 +22,22 @@ export default function CustomerHistory() {
   const [endDate, setEndDate] = useState<Date>()
   const [memos, setMemos] = useState<Memo[]>([])
   const [loading, setLoading] = useState(false)
+  const [realtimeSearchResult, setRealtimeSearchResult] = useState([] as Customer[])
+
+  const realtimeCustomerSearch = async () => {
+    if (!mobile) {
+      return
+    }
+    const foundCustomer = await customerService.getManyByMobile(mobile)
+    console.log("Realtime search found customer:", foundCustomer)
+    setRealtimeSearchResult(foundCustomer)
+  }
+
+  useEffect(() => {
+    realtimeCustomerSearch()
+  }, [mobile])
+
+
 
   const searchCustomerHistory = async () => {
     if (!mobile) {
@@ -39,6 +55,8 @@ export default function CustomerHistory() {
         setLoading(false)
         return
       }
+
+      console.log("Found customer:", foundCustomer)
 
       setCustomer(foundCustomer)
       const customerMemos = await memoService.getByCustomer(foundCustomer.id!, startDate, endDate)
@@ -133,6 +151,24 @@ export default function CustomerHistory() {
                 placeholder="Enter mobile number"
               />
             </div>
+
+            {/* Realtime Search Results */}
+            {
+              realtimeSearchResult.length > 0 && (
+                <div className="col-span-4 border-2 border-black bg-gray-300 w-fit absolute mt-14 rounded-xl" hidden={!mobile || mobile.length === 11}>
+                  <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
+                    {realtimeSearchResult.map((customer) => (
+                      <div key={customer.id} className="cursor-pointer hover:bg-gray-200" onClick={() => {setCustomer(customer); setMobile(customer.mobile); setMemos([])}}>
+                        <div className="p-1">
+                          <div className="font-medium">{customer.name}</div>
+                          <div className="text-sm text-muted-foreground">{customer.mobile}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            }
 
             <div>
               <Label>Start Date (Optional)</Label>
@@ -272,3 +308,5 @@ export default function CustomerHistory() {
     </div>
   )
 }
+
+
