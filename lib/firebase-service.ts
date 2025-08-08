@@ -12,17 +12,36 @@ import {
   limit,
 } from "firebase/firestore"
 import { db } from "./firebase"
-import type { Customer, Memo } from "@/types"
+import type { Customer, Memo, MemoItem } from "@/types"
 
 export const customerService = {
+  
   async getByMobile(mobile: string): Promise<Customer | null> {
-    const q = query(collection(db, "customers"), where("mobile", "==", mobile), limit(1))
+    const q = query(
+      collection(db, "customers"),
+      where("mobile", ">=", mobile),
+      where("mobile", "<=", mobile + "\uf8ff"),
+      limit(1)
+    )
     const snapshot = await getDocs(q)
 
     if (snapshot.empty) return null
 
     const doc = snapshot.docs[0]
     return { id: doc.id, ...doc.data() } as Customer
+  },
+
+  async getManyByMobile(mobile: string): Promise<Customer[]> {
+    const q = query(
+      collection(db, "customers"),
+      where("mobile", ">=", mobile),
+      where("mobile", "<=", mobile + "\uf8ff")
+    )
+    const snapshot = await getDocs(q)
+
+    if (snapshot.empty) return []
+
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Customer))
   },
 
   async create(customer: Omit<Customer, "id">): Promise<string> {
@@ -39,6 +58,46 @@ export const customerService = {
 }
 
 export const memoService = {
+  async saveItems(items: MemoItem[]): Promise<void> {
+    const tasks = items.map(async (item) => {
+      const q = query(
+        collection(db, "items"),
+        where("name", "==", item.itemName)
+      )
+      const snapshot = await getDocs(q)
+      if (snapshot.empty) {
+        await addDoc(collection(db, "items"), {
+          name: item.itemName,
+          rate: item.rate,
+          unit: item.unit
+        })
+      } else {
+        const docRef = doc(db, "items", snapshot.docs[0].id)
+        await updateDoc(docRef, {
+          rate: item.rate,
+          unit: item.unit
+        })
+      }
+    })
+    await Promise.all(tasks)
+  },
+
+  async getItemsByName(itemName: string): Promise<MemoItem[]> {
+    const q = query(
+      collection(db, "items"),
+      where("name", ">=", itemName),
+      where("name", "<=", itemName + "\uf8ff")
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((doc) => ({
+      itemName: doc.data().name,
+      // quantity: 0, // Default value, can be adjusted
+      unit: doc.data().unit,
+      rate: doc.data().rate,
+      // amount: 0, // Default value, can be adjusted
+    })) as MemoItem[]
+  },
+
   async create(memo: Omit<Memo, "id">): Promise<string> {
     const docRef = await addDoc(collection(db, "memos"), {
       ...memo,
